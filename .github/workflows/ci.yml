@@ -1,0 +1,15 @@
+name: build-and-test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  c17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run tests
+        run: make test
+      - name: Build and run nominal simulator
+        run: make simulator
