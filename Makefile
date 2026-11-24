@@ -7,12 +7,13 @@ CFLAGS ?= -std=c17 -Wall -Wextra -Werror -pedantic -O2
 CPPFLAGS ?= -Iinclude -Itests
 LDFLAGS ?=
 LDLIBS ?= -lm
+PYTHON ?= python
 BUILD_DIR ?= build
 CORE_SRC := $(wildcard src/*.c)
 TEST_BIN := $(BUILD_DIR)/test_core.exe
 SIM_BIN := $(BUILD_DIR)/whm_simulator.exe
 
-.PHONY: all test simulator clean
+.PHONY: all test simulator dashboard clean
 
 all: test simulator
 
@@ -36,6 +37,9 @@ test: $(TEST_BIN)
 
 simulator: $(SIM_BIN)
 	$(SIM_BIN) --seconds 12 --mode nominal
+
+dashboard: $(SIM_BIN)
+	$(PYTHON) app/dashboard_server.py
 
 ifeq ($(OS),Windows_NT)
 CLEAN_CMD = powershell -NoProfile -Command "if (Test-Path -LiteralPath '$(BUILD_DIR)') { Remove-Item -LiteralPath '$(BUILD_DIR)' -Recurse -Force }"
