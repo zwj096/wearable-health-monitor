@@ -25,7 +25,7 @@ bool whm_controller_init(whm_controller_t *controller,
     controller->tmp117 = tmp117;
     controller->battery_mv = initial_battery_mv;
     controller->latest_temperature_c = 0.0f;
-    if (!whm_max30102_init(&controller->max30102, &(whm_max30102_config_t){2u, 0x1fu})) {
+    if (!whm_max30102_init(&controller->max30102, &(whm_max30102_config_t){0u, 0x19u})) { /* 100 Hz FIFO, 5 mA/channel. */
         return false;
     }
     if (!whm_bmi270_init(&controller->bmi270) || !whm_tmp117_init(&controller->tmp117)) {
@@ -78,7 +78,7 @@ bool whm_controller_poll(whm_controller_t *controller) {
         sample.flags |= WHM_SAMPLE_SENSOR_FAULT;
     }
     controller->sample_index++;
-uint8_t packet[WHM_PACKET_SIZE] = {0};
+    uint8_t packet[WHM_PACKET_SIZE] = {0};
     size_t packet_length = 0u;
     const bool emitted = whm_runtime_push_sample(&controller->runtime,
                                                   &sample,

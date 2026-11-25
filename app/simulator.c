@@ -61,7 +61,8 @@ static whm_sample_t synthesize_sample(size_t index, simulation_mode_t mode) {
     sample.accel_x = motion ? (int16_t)(280.0 * sin(2.0 * WHM_PI * 2.0 * time_s)) : 0;
     sample.accel_y = 0;
     sample.accel_z = 1000;
-    sample.temperature_c = 33.5f;
+    const double temperature_time_s = floor(time_s);
+    sample.temperature_c = (float)(33.3 + 0.2 * (1.0 - exp(-temperature_time_s / 20.0)));
     sample.battery_mv = (uint16_t)(3800u - (unsigned)(index / (WHM_SAMPLE_RATE_HZ * 60u)));
     sample.flags = contact ? WHM_SAMPLE_CONTACT_OK : 0u;
     return sample;
@@ -78,7 +79,7 @@ int main(int argc, char **argv) {
     whm_runtime_init(&runtime);
     uint8_t packet[WHM_PACKET_SIZE] = {0};
     size_t packet_length = 0u;
-    printf("mode,sequence,timestamp_ms,state,heart_rate_bpm,quality,motion_mg,battery_mv,flags\n");
+    printf("mode,sequence,timestamp_ms,state,heart_rate_bpm,temperature_c,quality,motion_mg,battery_mv,flags\n");
     const size_t total_samples = (size_t)seconds * WHM_SAMPLE_RATE_HZ;
     for (size_t index = 0; index < total_samples; ++index) {
         const whm_sample_t sample = synthesize_sample(index, mode);
@@ -90,12 +91,13 @@ int main(int argc, char **argv) {
             fprintf(stderr, "protocol decode failed at sample %zu\n", index);
             return 1;
         }
-        printf("%s,%u,%u,%u,%.1f,%u,%u,%u,%u\n",
+        printf("%s,%u,%u,%u,%.1f,%.2f,%u,%u,%u,%u\n",
                mode == MODE_NOMINAL ? "nominal" : mode == MODE_MOTION ? "motion" : "nocontact",
                result.sequence,
                result.timestamp_ms,
                result.state,
                (double)result.heart_rate_bpm_x10 / 10.0,
+               (double)result.temperature_c_x100 / 100.0,
                result.quality,
                result.motion_mg,
                result.battery_mv,

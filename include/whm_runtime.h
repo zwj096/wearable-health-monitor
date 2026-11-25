@@ -13,7 +13,9 @@ typedef struct {
     whm_state_machine_t state;
     uint16_t sequence;
     uint64_t last_output_us;
+    uint64_t last_sample_us;
     bool output_started;
+    bool sample_started;
 } whm_runtime_t;
 
 void whm_runtime_init(whm_runtime_t *runtime);

@@ -18,6 +18,14 @@ enum {
     WHM_SAMPLE_SENSOR_FAULT = 1u << 2
 };
 
+enum {
+    WHM_RESULT_VALID = 1u << 0,
+    WHM_RESULT_NO_CONTACT = 1u << 1,
+    WHM_RESULT_CHARGING = 1u << 2,
+    WHM_RESULT_SENSOR_FAULT = 1u << 3,
+    WHM_RESULT_DATA_GAP = 1u << 4
+};
+
 typedef enum {
     WHM_STATE_INIT = 0,
     WHM_STATE_WAIT_CONTACT = 1,
@@ -32,7 +40,7 @@ typedef struct {
     uint64_t timestamp_us;
     int32_t ppg_red;
     int32_t ppg_ir;
-    int16_t accel_x;
+    int16_t accel_x; /* Acceleration axes are in mg, including gravity. */
     int16_t accel_y;
     int16_t accel_z;
     float temperature_c;
